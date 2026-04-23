@@ -258,7 +258,7 @@ void GPIO_ToggleOutputPin(GPIO_RegDef_t *pGPIOx, uint8_t PinNumber) {
 
 
 /*****************************************************************
- * name                 - GPIO_IRQConfig
+ * name                 - GPIO_IRQInterruptConfig
  *
  * scope                - Configure IRQ number, priority, and enable/disable state
  *
@@ -268,7 +268,7 @@ void GPIO_ToggleOutputPin(GPIO_RegDef_t *pGPIOx, uint8_t PinNumber) {
  *
  * return               - None
  */
-void GPIO_IRQConfig(uint8_t IRQNumber, uint8_t IRQPriority, uint8_t EnOrDi) {
+void GPIO_IRQInterruptConfig(uint8_t IRQNumber, uint8_t IRQPriority, uint8_t EnOrDi) {
 
 	if (EnOrDi) {
 		if (IRQNumber <= 31) {
@@ -291,6 +291,26 @@ void GPIO_IRQConfig(uint8_t IRQNumber, uint8_t IRQPriority, uint8_t EnOrDi) {
 	}
 }
 
+/*****************************************************************
+ * name                 - GPIO_IRQPriorityConfig
+ *
+ * scope                - Configure IRQ number, priority, and enable/disable state
+ *
+ * param IRQPriority    - priority level of the interrupt
+ *
+ * return               - None
+ */
+void GPIO_IRQPriorityConfig(uint8_t IRQNumber, uint8_t IRQPriority) {
+
+	// find out the IPR register
+	uint8_t iprx = IRQNumber / 4;				// get register
+	uint8_t iprx_section = IRQNumber % 4;		// get section in register
+
+
+	uint8_t shift_amount = (8 * iprx_section) + (8 - NO_PR_BITS_IMPLEMENTED);
+	*(NVIC_PR_BASE_ADDR + (iprx * 4)) |= ( IRQPriority << shift_amount );
+}
+
 
 /*****************************************************************
  * name                 - GPIO_IRQHandle
@@ -301,4 +321,11 @@ void GPIO_IRQConfig(uint8_t IRQNumber, uint8_t IRQPriority, uint8_t EnOrDi) {
  *
  * return               - None
  */
-void GPIO_IRQHandle(uint8_t PinNumber);
+void GPIO_IRQHandle(uint8_t PinNumber) {
+
+	// clear the EXTI PR register
+	if (EXTI->PR & ( 1 << PinNumber)) {
+		// clear (manual says to set as 1)
+		EXTI->PR |= ( 1 << PinNumber );
+	}
+}
