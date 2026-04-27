@@ -1,7 +1,6 @@
 #include "stm32f407xx.h"
 #include "stm32f407xx_gpio_driver.h"
 
-
 void delay() {
 	for (uint32_t i = 0; i < 500000/2; i++);
 }
@@ -18,6 +17,10 @@ uint8_t verify(GPIO_RegDef_t *pGPIOx, uint8_t pin) {
 	if (pupd != 0x0) return 1;
 
 	return 0;
+}
+
+void simulate_attack() {
+	GPIOD->MODER |= (0x3 << (2 * 12));
 }
 
 int main(void) {
@@ -40,11 +43,13 @@ int main(void) {
 		return 1;
 	}
 
-	GPIO_LockPin(GPIOD, GPIO_PIN_NO_12);
+	// comment and un-comment to test attack simulation
+//	GPIO_LockPin(GPIOD, GPIO_PIN_NO_12);
 
 	while(1) {
 		GPIO_ToggleOutputPin(GPIOD, GPIO_PIN_NO_12);
 		delay();
+		simulate_attack();
 	}
 
 	return 0;

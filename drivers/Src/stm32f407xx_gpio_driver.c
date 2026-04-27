@@ -356,9 +356,5 @@ void GPIO_LockPin(GPIO_RegDef_t *pGPIOx, uint8_t PinNumber){
 
 	// step 4: dummy read
 	(void)pGPIOx->LCKR;
-
-	// step 5: confirm
-	uint32_t result = pGPIOx->LCKR;
-
 }
 
