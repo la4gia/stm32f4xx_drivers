@@ -40,6 +40,8 @@ int main(void) {
 		return 1;
 	}
 
+	GPIO_LockPin(GPIOD, GPIO_PIN_NO_12);
+
 	while(1) {
 		GPIO_ToggleOutputPin(GPIOD, GPIO_PIN_NO_12);
 		delay();

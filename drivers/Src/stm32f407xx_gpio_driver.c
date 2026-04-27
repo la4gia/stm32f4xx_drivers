@@ -329,3 +329,36 @@ void GPIO_IRQHandle(uint8_t PinNumber) {
 		EXTI->PR |= ( 1 << PinNumber );
 	}
 }
+
+
+/*****************************************************************
+ * name                 - GPIO_LockPin
+ *
+ * scope                - Lock the Pin configuration for GPIO Register
+ *
+ * param *pGPIOx        - base address of the GPIO peripheral
+ * param PinNumber      - GPIO pin number that will be locked
+ *
+ * return               - None
+ */
+void GPIO_LockPin(GPIO_RegDef_t *pGPIOx, uint8_t PinNumber){
+
+	uint32_t temp = (1 << PinNumber);
+
+	// step 1: write with 1
+	pGPIOx->LCKR = (1 << 16) | temp;
+
+	// step 2: write with 0
+	pGPIOx->LCKR = temp;
+
+	// step 3: write with 1
+	pGPIOx->LCKR = (1 << 16) | temp;
+
+	// step 4: dummy read
+	(void)pGPIOx->LCKR;
+
+	// step 5: confirm
+	uint32_t result = pGPIOx->LCKR;
+
+}
+
