@@ -2,7 +2,7 @@
  * stm32f407xx.h
  *
  *  Created on: Mar 17, 2026
- *      Author: animal
+ *      Author: la4gia
  */
 
 #ifndef INC_STM32F407XX_H_
@@ -79,6 +79,9 @@
 
 #define EXTI_BASEADDR	(APB2PERIPH_BASE + 0x3C00)
 #define SPI1_BASEADDR	(APB2PERIPH_BASE + 0x3000)
+#define SPI4_BASEADDR	(APB2PERIPH_BASE + 0x3400)
+#define SPI5_BASEADDR	(APB2PERIPH_BASE + 0x5000)
+#define SPI6_BASEADDR	(APB2PERIPH_BASE + 0x5400)
 #define SYSCFG_BASEADDR	(APB2PERIPH_BASE + 0x3800)
 #define USART1_BASEADDR	(APB2PERIPH_BASE + 0x1000)
 #define USART6_BASEADDR	(APB2PERIPH_BASE + 0x1400)
@@ -225,8 +228,14 @@ typedef struct {
 #define SPI3_PCLK_EN()		(RCC->APB1ENR |= (1 << 15))		// SET RCC APB1 ENABLE BIT 15 TO 1
 #define SPI3_PCLK_DI()		(RCC->APB1ENR &= ~(1 << 15))	// SET RCC APB1 ENABLE BIT 15 TO 0
 
-//#define SPI4_PCLK_EN()		(RCC->APB2ENR |= (1 << 13))		// SET RCC APB2 ENABLE BIT 13 TO 1
-//#define SPI4_PCLK_DI()		(RCC->APB2ENR &= ~(1 << 13))	// SET RCC APB2 ENABLE BIT 13 TO 0
+#define SPI4_PCLK_EN()		(RCC->APB2ENR |= (1 << 13))		// SET RCC APB2 ENABLE BIT 13 TO 1
+#define SPI4_PCLK_DI()		(RCC->APB2ENR &= ~(1 << 13))	// SET RCC APB2 ENABLE BIT 13 TO 0
+
+#define SPI5_PCLK_EN()		(RCC->APB2ENR |= (1 << 20))		// SET RCC APB2 ENABLE BIT 20 TO 1
+#define SPI5_PCLK_DI()		(RCC->APB2ENR &= ~(1 << 20))	// SET RCC APB2 ENABLE BIT 20 TO 0
+
+#define SPI6_PCLK_EN()		(RCC->APB2ENR |= (1 << 21))		// SET RCC APB2 ENABLE BIT 21 TO 1
+#define SPI6_PCLK_DI()		(RCC->APB2ENR &= ~(1 << 21))	// SET RCC APB2 ENABLE BIT 21 TO 0
 
 // ENABLE/DISABLE CLOCK FOR USARTx PERIPHERALS
 
@@ -256,6 +265,67 @@ typedef struct {
 
 // SPI PERIPHERAL REGISTERS
 
+typedef struct {
+	volatile uint32_t SPI_CR1;		/* SPI Control Register 1 			Address offset: 0x00 */
+	volatile uint32_t SPI_CR2;      /* SPI Control Register 2 			Address offset: 0x04 */
+	volatile uint32_t SPI_SR;		/* SPI Status Register	  			Address offset: 0x08 */
+	volatile uint32_t SPI_DR;		/* SPI Data Register				Address offset: 0x0C */
+	volatile uint32_t SPI_CRCPR;	/* SPI CRC polynomial register		Address offset: 0x10 */
+	volatile uint32_t SPI_RXCRCR;	/* SPI RX CRC register				Address offset: 0x14 */
+	volatile uint32_t SPI_TXCRCR;	/* SPI TX CRC register				Address offset: 0x18 */
+	volatile uint32_t SPI_I2SCFGR;	/* SPI_I2S configuration register	Address offset: 0x1C */
+	volatile uint32_t SPI_I2SPR;	/* SPI_I2S prescaler register		Address offset: 0x20 */
+} SPI_RegDef_t;
+
+#define SPI1		((SPI_RegDef_t*)SPI1_BASEADDR)
+#define SPI2		((SPI_RegDef_t*)SPI2_BASEADDR)
+#define SPI3		((SPI_RegDef_t*)SPI3_BASEADDR)
+#define SPI4		((SPI_RegDef_t*)SPI4_BASEADDR)
+#define SPI5		((SPI_RegDef_t*)SPI5_BASEADDR)
+#define SPI6		((SPI_RegDef_t*)SPI6_BASEADDR)
+
+/*
+ * Bit position definitions SPI_CR1
+ */
+#define SPI_CR1_CPHA        0
+#define SPI_CR1_CPOL        1
+#define SPI_CR1_MSTR        2
+#define SPI_CR1_BR          3
+#define SPI_CR1_SPE         6
+#define SPI_CR1_LSB_FIRST   7
+#define SPI_CR1_SSI         8
+#define SPI_CR1_SSM         9
+#define SPI_CR1_RX_ONLY     10
+#define SPI_CR1_DFF         11
+#define SPI_CR1_CRC_NEXT    12
+#define SPI_CR1_CRC_EN      13
+#define SPI_CR1_BIDI_OE     14
+#define SPI_CR1_BIDI_MODE   15
+
+/*
+ * Bit position definitions SPI_CR2
+ */
+#define SPI_CR2_RXDMAEN     0
+#define SPI_CR2_TXDMAEN     1
+#define SPI_CR2_SSOE        2
+#define SPI_CR2_FRF         4
+#define SPI_CR2_ERRIE       5
+#define SPI_CR2_RXNEIE      6
+#define SPI_CR2_TXEIE       7
+
+/*
+ * Bit position definitions SPI_SR
+ */
+#define SPI_SR_RXNE         0
+#define SPI_SR_TXE          1
+#define SPI_SR_CHSIDE       2
+#define SPI_SR_UDR          3
+#define SPI_SR_CRC_ERR      4
+#define SPI_SR_MODF         5
+#define SPI_SR_OVR          6
+#define SPI_SR_BSY          7
+#define SPI_SR_FRE          8
+
 // RESET MACROS
 
 #define GPIOA_REG_RESET()		do{ (RCC->AHB1RSTR |= (1 << 0)); (RCC->AHB1RSTR &= ~(1 << 0)); }while(0)
@@ -267,6 +337,13 @@ typedef struct {
 #define GPIOG_REG_RESET()		do{ (RCC->AHB1RSTR |= (1 << 6)); (RCC->AHB1RSTR &= ~(1 << 6)); }while(0)
 #define GPIOH_REG_RESET()		do{ (RCC->AHB1RSTR |= (1 << 7)); (RCC->AHB1RSTR &= ~(1 << 7)); }while(0)
 #define GPIOI_REG_RESET()		do{ (RCC->AHB1RSTR |= (1 << 8)); (RCC->AHB1RSTR &= ~(1 << 8)); }while(0)
+
+#define SPI1_REG_RESET()		do{ (RCC->APB2RSTR |= (1 << 12)); (RCC->APB2RSTR &= ~(1 << 12)); }while(0)
+#define SPI2_REG_RESET()		do{ (RCC->APB1RSTR |= (1 << 14)); (RCC->APB1RSTR &= ~(1 << 14)); }while(0)
+#define SPI3_REG_RESET()		do{ (RCC->APB1RSTR |= (1 << 15)); (RCC->APB1RSTR &= ~(1 << 15)); }while(0)
+#define SPI4_REG_RESET()		do{ (RCC->APB2RSTR |= (1 << 13)); (RCC->APB2RSTR &= ~(1 << 13)); }while(0)
+#define SPI5_REG_RESET()		do{ (RCC->APB2RSTR |= (1 << 20)); (RCC->APB2RSTR &= ~(1 << 20)); }while(0)
+#define SPI6_REG_RESET()		do{ (RCC->APB2RSTR |= (1 << 21)); (RCC->APB2RSTR &= ~(1 << 21)); }while(0)
 
 // RETURNS PORT CODE FOR GIVEN GPIOx BASE ADDRESS
 
@@ -319,6 +396,8 @@ typedef struct {
 #define RESET			DISABLE
 #define GPIO_PIN_SET	SET
 #define GPIO_PIN_RESET	RESET
+#define FLAG_SET	SET
+#define FLAG_RESET	RESET
 
 #endif /* INC_STM32F407XX_H_ */
 

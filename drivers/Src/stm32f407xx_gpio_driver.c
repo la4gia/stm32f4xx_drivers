@@ -70,7 +70,7 @@ void GPIO_Init(GPIO_Handle_t *pGPIOHandle) {
 
 	uint32_t tmp = 0;
 
-//	GPIO_PeriClockControl(pGPIOHandle->pGPIOx, ENABLE);
+	GPIO_PeriClockControl(pGPIOHandle->pGPIOx, ENABLE);
 
 	// configure mode
 	if (pGPIOHandle->GPIO_PinConfig.GPIO_PinMode <= GPIO_MODE_ANALOG) {
