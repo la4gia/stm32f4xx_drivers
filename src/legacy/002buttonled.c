@@ -22,11 +22,11 @@ int main(void) {
 
 	GPIO_Handle_t gpio_but;
 
-	gpio_led.pGPIOx = GPIOA;
-	gpio_led.GPIO_PinConfig.GPIO_PinNumber = GPIO_PIN_NO_0;
-	gpio_led.GPIO_PinConfig.GPIO_PinMode = GPIO_MODE_IN;
-	gpio_led.GPIO_PinConfig.GPIO_PinSpeed = GPIO_SPEED_HIGH;
-	gpio_led.GPIO_PinConfig.GPIO_PinPuPdControl = GPIO_NO_PUPD;
+	gpio_but.pGPIOx = GPIOA;
+	gpio_but.GPIO_PinConfig.GPIO_PinNumber = GPIO_PIN_NO_0;
+	gpio_but.GPIO_PinConfig.GPIO_PinMode = GPIO_MODE_IN;
+	gpio_but.GPIO_PinConfig.GPIO_PinSpeed = GPIO_SPEED_HIGH;
+	gpio_but.GPIO_PinConfig.GPIO_PinPuPdControl = GPIO_NO_PUPD;
 
 	GPIO_PeriClockControl(GPIOA, ENABLE);
 	GPIO_Init(&gpio_but);
@@ -34,8 +34,7 @@ int main(void) {
 	while(1) {
 		if (GPIO_ReadFromInputPin(GPIOA, GPIO_PIN_NO_0)) {
 			delay();
-//			GPIO_ToggleOutputPin(GPIOD, GPIO_PIN_NO_12);
-			printf("hello");
+			GPIO_ToggleOutputPin(GPIOD, GPIO_PIN_NO_12);
 		}
 	}
 

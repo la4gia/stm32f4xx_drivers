@@ -1,4 +1,5 @@
 #include "stm32f407xx_spi_driver.h"
+#include "stm32f407xx.h"
 
 
 
@@ -169,8 +170,40 @@ void SPI_SendData(SPI_RegDef_t *pSPIx, uint8_t *pTxBuffer, uint32_t len) {
 }
 
 
+/*****************************************************************
+* name                 - SPI_ReceiveData
+ *
+ * scope                - Send data using RX of SPI. The "blocking" API.
+ *
+ * param *pSPIx        - base address of the SPI peripheral
+ * param *pRxBuffer	   - base address of the RX buffer (the data)
+ * param len		   - length of the RX buffer
+ *
+ * return               - None
+ */
+ void SPI_ReceiveData(SPI_RegDef_t *pSPIx, uint8_t *pRxBuffer, uint32_t len) {
+	
+		while (len > 0) {
+			// 1. wait until RXE is set (RXE = Rx Empty)
+			while (SPI_GetFlagStatus(pSPIx, SPI_RXNE_FLAG) == (uint8_t)FLAG_RESET);
+	
+			// 2. check the DFF bit in CR1
+			if ( pSPIx->SPI_CR1 & (1 << SPI_CR1_DFF ) ) {
+				// 16 BIT DFF
+				// 1. load the data into the DR
+				*(uint16_t*)pRxBuffer = pSPIx->SPI_DR;
+				len--;
+				len--;
+				(uint16_t*)pRxBuffer++;
+			} else {
+				// 8 bit DFF
+				*pRxBuffer = pSPIx->SPI_DR;
+				len--;
+				pRxBuffer++;
+			}
+		}
 
-void SPI_ReceiveData(SPI_RegDef_t *pSPIx, uint8_t *pRxBuffer, uint32_t len);
+}
 
 
 
@@ -209,5 +242,24 @@ void SPI_SSIConfig(SPI_RegDef_t *pSPIx, uint8_t EnOrDi) {
 		pSPIx->SPI_CR1 |= (1 << SPI_CR1_SSI);
 	} else {
 		pSPIx->SPI_CR1 &= ~(1 << SPI_CR1_SSI);
+	}
+}
+
+/*****************************************************************
+ * name                 - SPI_SSOEConfig
+ *
+ * scope                - Enable or disable peripheral
+ *
+ * param *pSPIx        - base address of the SPI peripheral
+ * param EnOrDi			- ENABLE or DISABLE
+ *
+ * return               - None
+ */
+void SPI_SSOEConfig(SPI_RegDef_t *pSPIx, uint8_t EnOrDi) {
+
+	if (EnOrDi == ENABLE) {
+		pSPIx->SPI_CR2 |= (1 << SPI_CR2_SSOE);
+	} else {
+		pSPIx->SPI_CR2 &= ~(1 << SPI_CR2_SSOE);
 	}
 }

@@ -3,7 +3,7 @@
 
 
 void delay() {
-	for (uint32_t i = 0; i < 500000/2; i++);
+	for (volatile uint32_t i = 0; i < 500000/2; i++);
 }
 
 int main(void) {
@@ -17,7 +17,7 @@ int main(void) {
 	gpio_led.GPIO_PinConfig.GPIO_PinOPtype = GPIO_OP_TYPE_PP;
 	gpio_led.GPIO_PinConfig.GPIO_PinPuPdControl = GPIO_NO_PUPD;
 
-	GPIO_PeriClockControl(GPIOD, ENABLE);
+	// GPIO_PeriClockControl(GPIOD, ENABLE);
 	GPIO_Init(&gpio_led);
 
 	while(1) {
